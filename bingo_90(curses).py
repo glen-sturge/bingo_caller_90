@@ -38,7 +38,7 @@ def main(stdscr):
     stdscr.refresh()
 
     # Main window. Red background, bingo label.
-    main_win = curses.newwin(21, 65, Y_START, X_START)
+    main_win = curses.newwin(21, 77, Y_START, X_START)
     main_win.bkgd(" ", RED_AND_BLACK | curses.A_REVERSE)
     main_win.addstr(1, 1, "   ", WHITE_AND_BLACK | curses.A_REVERSE)
     main_win.addstr(2, 1, " B ", WHITE_AND_BLACK | curses.A_REVERSE)
@@ -332,26 +332,51 @@ def main(stdscr):
     num_win90.refresh()
 
     # Loop, Each time hit Enter a new number 'lights up' until they are all lit.
-    # While the instruction is there, it doesn't actually exit by choice yet.
+    count = 0
     while True:
+        count += 1
         # Onscreen instructions window.
-        instruct_win = curses.newwin(2, 35, 1, 15)
-        instruct_win.addstr("Press Enter For A New Ball Number!\n    'B' if Bingo is called!")
+        instruct_win = curses.newwin(1, 35, Y_START - 1, X_START + 20)
+        instruct_win.addstr("Press Enter For A New Ball Number!", curses.A_REVERSE)
         instruct_win.refresh()
+
+        if 26 <= count < 36:
+            main_win.addstr(19, 62, "Anyone Close?",  WHITE_AND_BLACK | curses.A_REVERSE)
+            main_win.refresh()
+        elif 36 <= count < 51:
+            main_win.addstr(19, 62, "Still No one?",  WHITE_AND_BLACK | curses.A_REVERSE)
+            main_win.refresh()
+        elif 51 <= count < 76:
+            main_win.addstr(19, 62, "    Anyone?  ",  WHITE_AND_BLACK | curses.A_REVERSE)
+            main_win.refresh()
+        elif 76 <= count < 91:
+            main_win.addstr(19, 62, "Are We Awake?", WHITE_AND_BLACK | curses.A_REVERSE)
+            main_win.refresh()
+        elif count == 91:
+            main_win.addstr(19, 62, "  GAME OVER  ",  WHITE_AND_BLACK | curses.A_REVERSE)
+            main_win.refresh()
+
+        # Hold, wait for Enter.
         main_win.getch()
 
         # Choose a number at random.
         if BINGO_90_LIST:
             select = random.randint(0, (len(BINGO_90_LIST) - 1))
             called_number = BINGO_90_LIST.pop(select)
+
         else:
             break
 
         # Display the last called number.
-        called_win = curses.newwin(1, 20, 4, 23)
-        called_win.clear()
-        called_win.addstr(f"Last Number : {called_number}")
-        called_win.refresh()
+        # called_win = curses.newwin(1, 20, 4, 23)
+        main_win.addstr(1, 59, f" #'s Called : {count:>2d} ", WHITE_AND_BLACK | curses.A_REVERSE)
+        main_win.addstr(3, 59, f" This #     : {called_number:>2} ", WHITE_AND_BLACK | curses.A_REVERSE)
+        if count > 1:
+            main_win.addstr(5, 59, f" Last #     : {last:>2} ", WHITE_AND_BLACK | curses.A_REVERSE)
+        last = called_number
+        main_win.refresh()
+
+
 
         # Modify the called number window to be 'lit up'.
         if called_number == 1:
